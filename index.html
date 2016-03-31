@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Birthventure</title>
-
-
-
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Birthventure</title>
 
         <link href="bootstrap.min.css" rel="stylesheet" />
         <script src="jquery.min.js"></script>
@@ -50,17 +47,13 @@
 
                 function init(){
                    if (localStorage.getItem("area") == null){
-                       showInstructions(
-                           "Welcome to Birthventure!",
-                           "This is the place for Josh Stark to choose his own birthday adventure! First, you'll have to select the general area of town that you want to party in, then you'll get to pick a location for dinner, drinks, and a fun place to post-game it. There's no changing your mind after you've made a choice, so choose wisely!",
-                           "Ready?",
-                            function(){
-                                var choices = areas.map(function(area){
-                                    return area.name;
-                                });
-                                showChoices("Choose Your Area", "area", choices);
-                            }
-                        );
+                       var callback = function(){
+                            var choices = areas.map(function(area){
+                                return area.name;
+                            });
+                            showChoices("Choose Your Area", "area", choices);
+                       };
+                       showInstructions(callback);
                    } else {
                        var area = areas.filter(function(area){
                             return area.name == localStorage.getItem("area");
@@ -106,14 +99,12 @@
                     $("#main").html(html);
                 };
 
-                function showInstructions(title, instructions, buttonLabel, callback){
+                function showInstructions(callback){
                     var html = $("#instructions-template").html();
-                    html = html.replace("{title}", title);
-                    html = html.replace("{instructions}", instructions);
-                    html = html.replace("{buttonLabel}", buttonLabel);
                     $("#main").html(html);
-                    $("#main").on("click", "button", function(){
-                        $("#main").off("click", "button");
+                    $("#main").on("submit", function(e){
+                        e.preventDefault();
+                        $("#main").off("submit");
                         callback();
                     });
                 };
@@ -173,13 +164,28 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-xs-12">
-                        <h1>{title}</h1>
+                        <h1>Welcome to Birthventure!</h1>
                         <p>
-                            {instructions}
+                           This is the place for Josh Stark to choose his own birthday adventure!
+                           First, you'll have to select the general area of town that you want to party in,
+                           then you'll get to pick a location for dinner, drinks, and a fun place to post-game it.
+                           There's no changing your mind after you've made a choice, so choose wisely!
                         </p>
-                        <button type="button" class="btn btn-primary btn-lg btn-block">{buttonLabel}</button>
                     </div>
                 </div>
+
+                <div class="row">
+                  <div class="col-xs-12">
+                    <form class="input-group input-group-lg">
+                      <input type="text" class="form-control" placeholder="Enter password" pattern="partyparty" title="Invalid Password" required>
+                      <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit">Submit!</button>
+                      </span>
+                    </form>
+                  </div>
+                </div>
+
+
             </div>
         </script>
 
