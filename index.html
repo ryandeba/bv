@@ -126,7 +126,7 @@
                     if ($(this).data("category") == "postgame"){
                         localStorage.setItem("activityTime", moment().subtract(30, "minutes"));
                     } else if ($(this).data("category") != "area"){
-                        localStorage.setItem("activityTime", moment().add(5, "seconds"));
+                        localStorage.setItem("activityTime", moment().add(60, "minutes"));
                     };
                     init();
                 });
