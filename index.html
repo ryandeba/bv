@@ -4,15 +4,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap 101 Template</title>
+    <title>Birthventure</title>
 
 
 
 
         <link href="bootstrap.min.css" rel="stylesheet" />
         <script src="jquery.min.js"></script>
-        <script src="underscore-min.js"></script>
-        <script src="backbone-min.js"></script>
+        <script src="moment.min.js"></script>
         <script>
             $(function(){
                 localStorage.clear();
@@ -67,7 +66,9 @@
                             return area.name == localStorage.getItem("area");
                        })[0];
 
-                       if (localStorage.getItem("dinner") == null){
+                       if (moment(localStorage.getItem("activityTime")).isAfter(moment())){
+                           showWaiting();
+                       } else if (localStorage.getItem("dinner") == null){
                             var choices = area.Dinner;
                             showChoices("Dinner Time!!!", "dinner", choices);
                        } else if (localStorage.getItem("drinks") == null){
@@ -121,14 +122,26 @@
                     localStorage.setItem(category, choice);
                 };
 
+                function showWaiting(){
+                    var html = $("#waiting-template").html();
+                    var current = localStorage.getItem("postgame") || localStorage.getItem("drinks") || localStorage.getItem("dinner");
+                    html = html.replace("{current}", current);
+                    $("#main").html(html);
+                    setTimeout(function(){ init(); }, 5000);
+                };
+
                 $(document).on("click", "[data-category]", function(){
                     setCategoryChoice($(this).data("category"), $(this).html());
+                    if ($(this).data("category") != "area"){
+                        localStorage.setItem("activityTime", moment().add(20, "seconds"));
+                    };
                     init();
                 });
            });
         </script>
     </head>
     <body style="font-size: 14px;">
+    <!--
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -136,6 +149,7 @@
                 </div>
             </div>
         </nav>
+        -->
 
         <div id="main"></div>
 
@@ -191,7 +205,22 @@
             </div>
         </script>
 
-
+        <script type="text/template" id="waiting-template">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h1>{current}</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p>
+                            Come back later to pick your next activty!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </script>
 
     </body>
 </html>
