@@ -132,8 +132,10 @@
 
                 $(document).on("click", "[data-category]", function(){
                     setCategoryChoice($(this).data("category"), $(this).html());
-                    if ($(this).data("category") != "area"){
-                        localStorage.setItem("activityTime", moment().add(20, "seconds"));
+                    if ($(this).data("category") == "postgame"){
+                        localStorage.setItem("activityTime", moment());
+                    } else if ($(this).data("category") != "area"){
+                        localStorage.setItem("activityTime", moment().add(5, "seconds"));
                     };
                     init();
                 });
