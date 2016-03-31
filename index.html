@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="bootstrap.min.css" rel="stylesheet" />
+        <script src="jquery.min.js"></script>
+        <script src="underscore-min.js"></script>
+        <script src="backbone-min.js"></script>
+        <script>
+            $(function(){
+                localStorage.clear();
+                var areas = [
+                    {
+                        name: "Waldo",
+                        "Dinner": [ "Waldo Pizza", "75th Street Brewery", ],
+                        "Drinks": [ "The Well", "Johnny Kaw's Shot Bar" ],
+                        "Post-game": [ "Ryan's Apartment", "Your Apartment" ]
+                    },
+                    {
+                        name: "West Bottoms / Ryan's Hood",
+                        "Dinner": [ "BRGR", "The Peanut" ],
+                        "Drinks": [ "No Other Pub", "The Ship" ],
+                        "Post-game": [ "Ryan's Apartment", "John's Big Deck" ]
+                    },
+                    {
+                        name: "Westport",
+                        "Dinner": [ "McCoy's", "Papa Keno's" ],
+                        "Drinks": [ "Westport Saloon", "Throwback" ],
+                        "Post-game": [ "Kelly's (Joe's pizza!)", "Donut Lounge" ]
+                    },
+                    {
+                        name: "Martini Corner",
+                        "Dinner": [ "Barrel 31", "Sol Cantina" ],
+                        "Drinks": [ "Ollie's", "Tower Tavern" ],
+                        "Post-game": [ "Ryan's Apartment", "Your place" ]
+                    },
+                    {
+                        name: "Crossroads",
+                        "Dinner": [ "Ponak's", "Grinders" ],
+                        "Drinks": [ "UpDown", "Green Lady Lounge" ],
+                        "Post-game": [ "Ryan's Apartment", "Town Topic" ]
+                    }
+               ];
+
+                function init(){
+                   if (localStorage.getItem("area") == null){
+                       showInstructions(
+                           "Welcome to Birthventure!",
+                           "This is the place for Josh Stark to choose his own birthday adventure! First, you'll have to select the general area of town that you want to party in, then you'll get to pick a location for dinner, drinks, and a fun place to post-game it. There's no changing your mind after you've made a choice, so choose wisely!",
+                           "Ready?",
+                            function(){
+                                var choices = areas.map(function(area){
+                                    return area.name;
+                                });
+                                showChoices("Choose Your Area", "area", choices);
+                            }
+                        );
+                   } else {
+                       var area = areas.filter(function(area){
+                            return area.name == localStorage.getItem("area");
+                       })[0];
+
+                       if (localStorage.getItem("dinner") == null){
+                            var choices = area.Dinner;
+                            showChoices("Dinner Time!!!", "dinner", choices);
+                       } else if (localStorage.getItem("drinks") == null){
+                            var choices = area.Drinks;
+                            showChoices("Drink Time!!!", "drinks", choices);
+                       } else if (localStorage.getItem("postgame") == null){
+                            var choices = area["Post-game"];
+                            showChoices("Let's post-game it!!!", "postgame", choices);
+                       } else {
+                           showSummary();
+                       };
+                   };
+                };
+                init();
+
+                function showChoices(title, category, choices){
+                    var html = $("#choice-template").html();
+                    html = html.replace("{activityName}", title);
+                    $("#main").html(html);
+
+                    choices.forEach(function(choice){
+                        var html = '<button type="button" class="btn btn-default btn-lg btn-block" data-category="' + category + '">' + choice + '</button>';
+                        $("#main").find(".js-choices").append(html);
+                    });
+                };
+
+                function showSummary(){
+                    var html = $("#summary-template").html();
+                    html = html.replace("{dinner}", localStorage.getItem("dinner"));
+                    html = html.replace("{drinks}", localStorage.getItem("drinks"));
+                    html = html.replace("{postgame}", localStorage.getItem("postgame"));
+                    $("#main").html(html);
+                };
+
+                function showInstructions(title, instructions, buttonLabel, callback){
+                    var html = $("#instructions-template").html();
+                    html = html.replace("{title}", title);
+                    html = html.replace("{instructions}", instructions);
+                    html = html.replace("{buttonLabel}", buttonLabel);
+                    $("#main").html(html);
+                    $("#main").on("click", "button", function(){
+                        $("#main").off("click", "button");
+                        callback();
+                    });
+                };
+
+                function setCategoryChoice(category, choice){
+                    localStorage.setItem(category, choice);
+                };
+
+                $(document).on("click", "[data-category]", function(){
+                    setCategoryChoice($(this).data("category"), $(this).html());
+                    init();
+                });
+           });
+        </script>
+    </head>
+    <body>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                  <a class="navbar-brand" href="#">Birthventure</a>
+                </div>
+            </div>
+        </nav>
+
+        <div id="main"></div>
+
+        <script type="text/template" id="choice-template">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h3>{activityName}</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 js-choices">
+                    </div>
+                </div>
+            </div>
+        </script>
+
+        <script type="text/template" id="instructions-template">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h3>{title}</h3>
+                        <p>
+                            {instructions}
+                        </p>
+                        <button type="button" class="btn btn-primary btn-lg btn-block">{buttonLabel}</button>
+                    </div>
+                </div>
+            </div>
+        </script>
+
+
+
+        <script type="text/template" id="summary-template">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h3>Thanks for Birthday-ing!</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p>
+                            We stuffed our faces at <span class="label label-primary">{dinner}</span>,
+                            then partied hard at <span class="label label-primary">{drinks}</span>,
+                            all before post-gaming it <span class="label label-primary">{postgame}</span>.
+                        </p>
+                        <h4>
+                            Happy Birthday Josh!
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </script>
+
+
+
+    </body>
+</html>
